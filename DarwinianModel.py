@@ -1,5 +1,6 @@
 import numpy as np
 import random
+defaultWeights=(0, 30, 0, 0, 70, 0)
 
 
 class DfaData:
@@ -12,7 +13,7 @@ class DfaData:
                           'q1': {0: ['q0', 'tr'], 1: ['q1', 'm']},
                       }
         self.initialState = 'q0'
-        self.initialDirection = np.array([0,1])
+        self.initialDirection = np.array([0, 1])
         self.actions = ['tl', 'tr', 'm']
         self.totalStatesNumber = 2
 
@@ -54,12 +55,26 @@ def generate_trail():
     return trail
 
 
-def mutate_dfa(dfa):
+def clone_dfa(dfa):
+
+    newDfa = DfaData()
+    newDfa.states = list(dfa.states)
+    newDfa.inputSymbols = list(dfa.inputSymbols)
+    newDfa.transitions = dict(dfa.transitions)
+    newDfa.initialState = str(dfa.initialState)
+    newDfa.initialDirection = list(dfa.initialDirection)
+    newDfa.actions = list(dfa.actions)
+    newDfa.totalStatesNumber = int(dfa.totalStatesNumber)
+
+    return newDfa
+
+
+def mutate_dfa(dfa, weights):
 
     possibleMutations = ["change start", "add state", "delete state", "change transition",
                  "add transition", "delete transition"]
 
-    mutation = random.choices(possibleMutations, weights=(0, 30, 0, 30, 40, 0), k=1)
+    mutation = random.choices(possibleMutations, weights=weights, k=1)
     mutation = mutation[0]                      #weights=(5, 20, 5, 25, 40, 5)
 
     if mutation == 'change start':
@@ -67,11 +82,17 @@ def mutate_dfa(dfa):
 
     if mutation == 'add state':
 
+        #stateNumber = dfa.totalStatesNumber
+        #newState = 'q' + str(stateNumber)
+        #dfa.totalStatesNumber += 1
+        #dfa.states.append(newState)
+        #dfa.transitions[newState] = {0: ['', ''], 1: ['', '']}
         stateNumber = dfa.totalStatesNumber
         newState = 'q' + str(stateNumber)
         dfa.totalStatesNumber += 1
         dfa.states.append(newState)
-        dfa.transitions[newState] = {0: ['', ''], 1: ['', '']}
+        dfa.transitions[newState] = {0: [random.choice(dfa.states), random.choice(dfa.actions)],
+                                             1: [random.choice(dfa.states), random.choice(dfa.actions)]}
 
     if mutation == 'delete state':
         # Have to make sure it can handle all states being deleted
@@ -129,6 +150,36 @@ def mutate_dfa(dfa):
     return dfa
 
 
+def mutate_dfa2(dfaToMutate, weights):
+    possibleMutations = ["change start", "add state", "change transition"]
+
+    mutation = random.choices(possibleMutations, weights=weights, k=1)
+    mutation = mutation[0]
+
+    if mutation == "change start":
+        dfaToMutate.initialState = random.choice(dfaToMutate.states)
+
+    elif mutation == "add state":
+        stateNumber = dfaToMutate.totalStatesNumber
+        newState = 'q' + str(stateNumber)
+        dfaToMutate.totalStatesNumber += 1
+        dfaToMutate.states.append(newState)
+        dfaToMutate.transitions[newState] = {0: [random.choice(dfaToMutate.states), random.choice(dfaToMutate.actions)],
+                                             1: [random.choice(dfaToMutate.states), random.choice(dfaToMutate.actions)]}
+
+    elif mutation == "change transition":
+        stateToChange = random.choice(dfaToMutate.states)
+        inputToChange = random.choice([0,1])
+
+        newTargetState = random.choice(dfaToMutate.states)
+        newTargetAction = random.choice(dfaToMutate.actions)
+
+        dfaToMutate.transitions[stateToChange][inputToChange] = [newTargetState, newTargetAction]
+
+    mutatedDfa = dfaToMutate
+    return mutatedDfa
+
+
 def run_iteration(dfa, number_steps=600):
 
     trail = generate_trail()
@@ -156,7 +207,12 @@ def run_iteration(dfa, number_steps=600):
 
         adjecentCellValue = trail[adjecentCellPos[0], adjecentCellPos[1]]
 
-        transition = dfa.transitions[currentState][adjecentCellValue]
+        if currentState in dfa.transitions:
+            transition = dfa.transitions[currentState][adjecentCellValue]
+        else:
+            print(currentState, "not in", dfa.transitions)
+            print("states:", dfa.states)
+            return
 
         if transition != ['', '']:
             newState = transition[0]

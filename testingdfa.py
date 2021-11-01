@@ -190,9 +190,9 @@ def run_iteration(dfa, visualise=False):
     if visualise:
         update_display(trail, currentCell, currentDirection)
 
-    for i in range(1000):
+    for i in range(800):
         if visualise:
-            pygame.time.wait(80)
+            pygame.time.wait(100)
         #print("current state:", currentState)
         if dfa.initialState == '':
             newState = currentState
@@ -264,26 +264,43 @@ def run_iteration(dfa, visualise=False):
         if visualise:
             update_display(trail, currentCell, currentDirection)
 
+        if score == 89:
+            pygame.time.wait(5000)
+            break
+
     return score, agentActionHistory
 
 
 scoresList = []
 
+def run():
+    for j in range(100000):
+        dfa2 = dfa_data()
+        for i in range(10):
+            dfa2 = mutate_dfa(dfa2)
 
-for j in range(100000):
-    dfa2 = dfa_data()
-    for i in range(10):
-        dfa2 = mutate_dfa(dfa2)
+        #print(dfa2.transitions)
 
-    #print(dfa2.transitions)
+        score, agentActionHistory = run_iteration(dfa2)
+        scoresList.append(score)
+        #print("Agent Action History:", agentActionHistory)
+        if score > 24:
+            print("Final Score:", score)
 
-    score, agentActionHistory = run_iteration(dfa2)
-    scoresList.append(score)
-    #print("Agent Action History:", agentActionHistory)
-    if score > 20:
-        print("Final Score:", score)
+            run_iteration(dfa2, visualise=True)
 
-        run_iteration(dfa2, visualise=True)
+
+dfa_model = dfa_data()
+dfa_model.states = ['q0', 'q1', 'q2', 'q3', 'q4']
+dfa_model.transitions = {'q0': {0: ['q1', 'tr'], 1: ['q0', 'm']},
+                         'q1': {0: ['q2', 'tr'], 1: ['q0', 'm']},
+                         'q2': {0: ['q3', 'tr'], 1: ['q0', 'm']},
+                         'q3': {0: ['q4', 'tr'], 1: ['q0', 'm']},
+                         'q4': {0: ['q0', 'm'], 1: ['q0', 'm']}}
+
+score, agentActionHistory = run_iteration(dfa_model, visualise=True)
+print("Moves:", agentActionHistory)
+print("Number of moves: ", len(agentActionHistory))
 
 # sorting the list
 #scoresList.sort()
