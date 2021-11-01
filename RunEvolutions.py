@@ -472,10 +472,10 @@ def run_model5(num_of_initial_mutations, num_generations, generation_size, max_d
                 if random.randint(0, 100) < 60:
 
                     if len(new_dfa.states) <= max_dfa_states:
-                        weights = (5, 15, 5, 30, 40, 5)
+                        weights=(10, 30, 60)
                     else:
-                        weights = (10, 0, 5, 35, 45, 5)
-                    mutated_dfa = mutate_dfa(new_dfa, weights=weights)
+                        weights=(20, 0, 80)
+                    mutated_dfa = mutate_dfa2(new_dfa, weights=weights)
 
                     mutant_score, mutant_movement_history = run_iteration(mutated_dfa, number_steps=500)
                     if mutant_score == 89:
@@ -554,10 +554,10 @@ def run_model6(num_of_initial_mutations, num_generations, generation_size, max_d
                     if random.randint(0, 100) < 50:
 
                         if len(new_dfa.states) <= max_dfa_states:
-                            weights = (5, 15, 5, 30, 40, 5)
+                            weights = (10, 30, 60)
                         else:
-                            weights = (10, 0, 5, 35, 45, 5)
-                        mutated_dfa = mutate_dfa(new_dfa, weights=weights)
+                            weights = (20, 0, 80)
+                        mutated_dfa = mutate_dfa2(new_dfa, weights=weights)
 
                         mutant_score, mutant_movement_history = run_iteration(mutated_dfa, number_steps=500)
                         if mutant_score == 89:
@@ -636,10 +636,10 @@ def run_model7(num_of_initial_mutations, num_generations, generation_size, max_d
                     if random.randint(0, 100) < 70:
 
                         if len(new_dfa.states) <= max_dfa_states:
-                            weights = (5, 15, 5, 30, 40, 5)
+                            weights=(10, 30, 60)
                         else:
-                            weights = (10, 0, 5, 35, 45, 5)
-                        mutated_dfa = mutate_dfa(new_dfa, weights=weights)
+                            weights=(20, 0, 80)
+                        mutated_dfa = mutate_dfa2(new_dfa, weights=weights)
 
                         mutant_score, mutant_movement_history = run_iteration(mutated_dfa, number_steps=500)
                         if mutant_score == 89:
