@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import random
 defaultWeights=(0, 30, 0, 0, 70, 0)
@@ -55,129 +57,61 @@ def generate_trail():
     return trail
 
 
-def clone_dfa(dfa):
+def change_start(dfa):
 
-    newDfa = DfaData()
-    newDfa.states = list(dfa.states)
-    newDfa.inputSymbols = list(dfa.inputSymbols)
-    newDfa.transitions = dict(dfa.transitions)
-    newDfa.initialState = str(dfa.initialState)
-    newDfa.initialDirection = list(dfa.initialDirection)
-    newDfa.actions = list(dfa.actions)
-    newDfa.totalStatesNumber = int(dfa.totalStatesNumber)
+    dfaCopy = copy.deepcopy(dfa)
+    dfa.initialState = random.choice(dfaCopy.states)
 
-    return newDfa
+
+def add_state(dfa):
+
+    dfaCopy = copy.deepcopy(dfa)
+    stateNumber = dfaCopy.totalStatesNumber
+    newState = 'q' + str(stateNumber)
+    dfa.totalStatesNumber += 1
+    dfa.states.append(newState)
+    dfa.transitions[newState] = {0: [random.choice(dfaCopy.states), random.choice(dfaCopy.actions)],
+                                 1: [random.choice(dfaCopy.states), random.choice(dfaCopy.actions)]}
+
+
+def change_transition(dfa):
+
+    dfaCopy = copy.deepcopy(dfa)
+
+    if len(dfa.transitions) > 0:
+        stateToChange = random.choice([state for state in dfaCopy.transitions])
+        stateInput = random.choice([0, 1])
+        newState = random.choice(dfaCopy.states)
+        newAction = random.choice(dfaCopy.actions)
+        dfa.transitions[stateToChange][stateInput] = [newState, newAction]
+
+
+def generate_dfa(number_states=2):
+
+    new_dfa = DfaData()
+
+    if number_states-2 > 0:
+        for i in range(number_states-2):
+            add_state(new_dfa)
+
+    return new_dfa
 
 
 def mutate_dfa(dfa, weights):
-
-    possibleMutations = ["change start", "add state", "delete state", "change transition",
-                 "add transition", "delete transition"]
-
-    mutation = random.choices(possibleMutations, weights=weights, k=1)
-    mutation = mutation[0]                      #weights=(5, 20, 5, 25, 40, 5)
-
-    if mutation == 'change start':
-        dfa.initialState = random.choice(dfa.states)
-
-    if mutation == 'add state':
-
-        #stateNumber = dfa.totalStatesNumber
-        #newState = 'q' + str(stateNumber)
-        #dfa.totalStatesNumber += 1
-        #dfa.states.append(newState)
-        #dfa.transitions[newState] = {0: ['', ''], 1: ['', '']}
-        stateNumber = dfa.totalStatesNumber
-        newState = 'q' + str(stateNumber)
-        dfa.totalStatesNumber += 1
-        dfa.states.append(newState)
-        dfa.transitions[newState] = {0: [random.choice(dfa.states), random.choice(dfa.actions)],
-                                             1: [random.choice(dfa.states), random.choice(dfa.actions)]}
-
-    if mutation == 'delete state':
-        # Have to make sure it can handle all states being deleted
-        if len(dfa.states) > 2:
-
-            stateToDelete = random.choice(dfa.states)
-            if stateToDelete != dfa.initialState:
-
-                dfa.states.remove(stateToDelete)
-
-                del dfa.transitions[stateToDelete]
-
-                for state in dfa.transitions:
-
-                    if dfa.transitions[state][0][0] == stateToDelete:
-                        dfa.transitions[state][0] = ['', '']
-                    if dfa.transitions[state][1][0] == stateToDelete:
-                        dfa.transitions[state][1] = ['', '']
-
-    if mutation == 'change transition':
-        if len(dfa.transitions) > 0:
-            stateToChange = random.choice([state for state in dfa.transitions])
-            stateInput = random.choice([0,1])
-            newState = random.choice(dfa.states)
-            newAction = random.choice(dfa.actions)
-            dfa.transitions[stateToChange][stateInput] = [newState, newAction]
-
-    if mutation == 'add transition':
-        emptyTransitions = []
-        for state in dfa.transitions:
-            if dfa.transitions[state][0] == ['', '']:
-                emptyTransitions.append([state, 0])
-
-            elif dfa.transitions[state][1] == ['', '']:
-                emptyTransitions.append([state, 1])
-
-        if emptyTransitions:
-            newTransitionChoice = random.choice(emptyTransitions)
-
-            stateToChange = newTransitionChoice[0]
-            inputToChange = newTransitionChoice[1]
-
-            newTransitionDestination = random.choice(dfa.states)
-            newTransitionAction = random.choice(dfa.actions)
-
-            dfa.transitions[stateToChange][inputToChange] = [newTransitionDestination, newTransitionAction]
-
-    if mutation == 'delete transition':
-        if dfa.transitions:
-                state = random.choice(dfa.states)
-                input = random.choice([0, 1])
-
-                dfa.transitions[state][input] = ['', '']
-
-    return dfa
-
-
-def mutate_dfa2(dfaToMutate, weights):
-    possibleMutations = ["change start", "add state", "change transition"]
+    #      [change start, add state, change transition]
+    possibleMutations = [1, 2, 3]
 
     mutation = random.choices(possibleMutations, weights=weights, k=1)
     mutation = mutation[0]
 
-    if mutation == "change start":
-        dfaToMutate.initialState = random.choice(dfaToMutate.states)
+    if mutation == 1:
+        change_start(dfa)
 
-    elif mutation == "add state":
-        stateNumber = dfaToMutate.totalStatesNumber
-        newState = 'q' + str(stateNumber)
-        dfaToMutate.totalStatesNumber += 1
-        dfaToMutate.states.append(newState)
-        dfaToMutate.transitions[newState] = {0: [random.choice(dfaToMutate.states), random.choice(dfaToMutate.actions)],
-                                             1: [random.choice(dfaToMutate.states), random.choice(dfaToMutate.actions)]}
+    elif mutation == 2:
+        add_state(dfa)
 
-    elif mutation == "change transition":
-        stateToChange = random.choice(dfaToMutate.states)
-        inputToChange = random.choice([0,1])
-
-        newTargetState = random.choice(dfaToMutate.states)
-        newTargetAction = random.choice(dfaToMutate.actions)
-
-        dfaToMutate.transitions[stateToChange][inputToChange] = [newTargetState, newTargetAction]
-
-    mutatedDfa = dfaToMutate
-    return mutatedDfa
+    elif mutation == 3:
+        change_transition(dfa)
 
 
 def run_iteration(dfa, number_steps=600):
@@ -223,6 +157,8 @@ def run_iteration(dfa, number_steps=600):
                     trail[adjecentCellPos[0], adjecentCellPos[1]] = 0
                     score += 1
                 currentCell = adjecentCellPos
+                if score == 89:
+                    return score, agentActionHistory
 
             elif action == 'tl':
                 currentDirection = np.array([-currentDirection[1], currentDirection[0]])
