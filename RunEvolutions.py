@@ -233,4 +233,4 @@ def run_model(initial_dfa_size, num_generations, generation_size, max_dfa_states
 
 
 if __name__ == "__main__":
-    run_model(4, 600, 5000, 15)
+    run_model(4, 600, 1000, 15)
