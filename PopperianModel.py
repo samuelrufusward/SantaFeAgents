@@ -1,7 +1,51 @@
 import copy
 import itertools
+import pygame
 import numpy as np
 from DarwinianModel import generate_trail
+from RunEvolutions import update_display
+screenWidth = 640
+
+
+def visualise_moves(moves):
+    pygame.init()
+
+    # Initialises game window
+    win = pygame.display.set_mode((screenWidth, screenWidth))
+
+    # Sets display window caption to Chess
+    pygame.display.set_caption("Popperian Ant Model")
+
+    trail = generate_trail()
+    currentCell = [0, 0]
+    currentDirection = np.array([0, 1])
+
+    update_display(trail, win, currentCell, currentDirection)
+
+    for action in moves:
+
+        pygame.time.wait(100)
+
+        adjecentCellRow = (currentCell[0] + currentDirection[0]) % 32
+        adjecentCellColumn = (currentCell[1] + currentDirection[1]) % 32
+        adjecentCellPos = [adjecentCellRow, adjecentCellColumn]
+        adjecentCellValue = trail[adjecentCellPos[0], adjecentCellPos[1]]
+
+        if action == 'm':
+            if adjecentCellValue == 1:
+                trail[adjecentCellPos[0], adjecentCellPos[1]] = 0
+            currentCell = adjecentCellPos
+
+        elif action == 'tl':
+            currentDirection = np.array([-currentDirection[1], currentDirection[0]])
+
+        elif action == 'tr':
+            currentDirection = np.array([currentDirection[1], -currentDirection[0]])
+
+        elif action == 'n':
+            pass
+
+        update_display(trail, win, currentCell, currentDirection)
 
 
 def test_move(moves, currentCell, currentDirection, trail):
@@ -39,6 +83,7 @@ def run_model(numFutureMoves):
     currentDirection = np.array([0, 1])
     cumulativeScore = 0
     scoresList = []
+    optimalMoves = []
 
     actions = ['tr', 'tl', 'm']
     possibleMoves = [p for p in itertools.product(actions, repeat=numFutureMoves)]
@@ -58,6 +103,9 @@ def run_model(numFutureMoves):
         bestMove = possibleMoves[index_max]
         print("Best Moves:", bestMove)
 
+        for action in bestMove:
+            optimalMoves.append(action)
+
         test_trail = copy.deepcopy(trail)
         bestResult = test_move(bestMove, currentCell, currentDirection, test_trail)
 
@@ -70,6 +118,8 @@ def run_model(numFutureMoves):
         print("Cumulative Score:", cumulativeScore)
 
         scoresList = []
+
+    visualise_moves(optimalMoves)
 
 
 if __name__ == "__main__":

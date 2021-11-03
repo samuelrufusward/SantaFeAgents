@@ -132,6 +132,7 @@ def visualise_iterations(dfa):
 
     return score, agentActionHistory
 
+
 def sorting_of_element(list1, list2):
     # initializing blank dictionary
     f_1 = {}
