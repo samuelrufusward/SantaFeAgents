@@ -48,11 +48,11 @@ def visualise_moves(moves):
         update_display(trail, win, currentCell, currentDirection)
 
 
-def test_move(moves, currentCell, currentDirection, trail):
+def test_move(move, currentCell, currentDirection, trail):
 
     score = 0
 
-    for action in moves:
+    for action in move:
 
         adjecentCellRow = (currentCell[0] + currentDirection[0]) % 32
         adjecentCellColumn = (currentCell[1] + currentDirection[1]) % 32
@@ -124,4 +124,8 @@ def run_model(numFutureMoves):
 
 if __name__ == "__main__":
     # Agent that can see 7 moves into future
-    run_model(numFutureMoves=7)
+    run_model(numFutureMoves=8)
+    # TO DO:
+    # If future moves is small it won't always have a clear best choice for which moves is best in the long run
+    # When this happens it should chose a random one and keep going
+    # For a whole population doing this, save these random choices and add weightings to the more successful ones

@@ -176,8 +176,8 @@ def run_model(initial_dfa_size, num_generations, generation_size, max_dfa_states
         sorted_dfas = list(reversed(sorting_of_element(dfa_list, scores_list)))
 
         # Visualise every 50 generations
-        #if i % 50 == 0:
-        #    visualise_iterations(sorted_dfas[0])
+        if i % 30 == 0:
+            visualise_iterations(sorted_dfas[0])
 
         parent_scores_list = []
         parent_dfas = sorted_dfas[0:100]
@@ -235,3 +235,6 @@ def run_model(initial_dfa_size, num_generations, generation_size, max_dfa_states
 
 if __name__ == "__main__":
     run_model(4, 600, 5000, 15)
+    # TO DO
+    # Rank solutions by number of moves
+    # Add parent combination
