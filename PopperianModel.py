@@ -129,3 +129,4 @@ if __name__ == "__main__":
     # If future moves is small it won't always have a clear best choice for which moves is best in the long run
     # When this happens it should chose a random one and keep going
     # For a whole population doing this, save these random choices and add weightings to the more successful ones
+    # Branch splitting for each decision when same score for multiple paths to generate decision tree

@@ -233,8 +233,98 @@ def run_model(initial_dfa_size, num_generations, generation_size, max_dfa_states
         print("best score of generation:", max(scores_list))
 
 
+def run_model2(initial_dfa_size, num_generations, generation_size, max_dfa_states, number_steps=500):
+    performance_dict = {}
+    scores_list = []
+    mutant_scores_list = []
+    parent_scores_list = []
+    dfa_list = []
+    print("\nGeneration Number: 0")
+
+    for i in range(generation_size):
+        dfa_model = generate_dfa(number_states=initial_dfa_size)
+        dfa_list.append(dfa_model)
+        score, history = run_iteration(dfa_model, number_steps=number_steps)
+        scores_list.append(score)
+        performance_dict[copy.deepcopy(dfa_model)] = [score, number_steps - len(history)]
+    print("performance dict:", performance_dict)
+
+    average_score = sum(scores_list) / len(scores_list)
+    print("\naverage score:", average_score)
+    print("best score of generation:", max(scores_list))
+
+    for i in range(num_generations):
+        print("\nGeneration Number:", i+1)
+        # Sort DFAs by score in descending order
+        sorted_dfas_dict = {k: v for k, v in sorted(performance_dict.items(), key=lambda item: item[1])}
+        #print("sorted dfa dict:", sorted_dfas_dict)
+        sorted_dfas = list(reversed(list(sorted_dfas_dict.keys())))
+
+        # Reset DFA performance dictionary
+        performance_dict = {}
+
+        # Visualise every 50 generations
+        #if i % 30 == 0:
+        #    visualise_iterations(sorted_dfas[0])
+
+        parent_scores_list = []
+        parent_dfas = sorted_dfas[0:50]
+        for dfa_model in parent_dfas:
+            parent_score, parent_movement_history = run_iteration(dfa_model, number_steps=number_steps)
+            parent_scores_list.append(parent_score)
+            performance_dict[copy.deepcopy(dfa_model)] = [parent_score, number_steps - len(parent_movement_history)]
+            if parent_score == 89:
+                print("\nScore: 89")
+                print("Number of moves:", len(parent_movement_history))
+                print("Move history:", parent_movement_history)
+                print("Number of states:", len(dfa_model.states))
+                #visualise_iterations(dfa_model)
+
+        mutated_dfa_list = []
+        mutant_scores_list = []
+        for k in range(19):
+            for dfa_model in parent_dfas:
+                new_dfa = copy.deepcopy(dfa_model)
+
+                if random.randint(0, 100) < 100:
+
+                    if len(new_dfa.states) <= max_dfa_states:
+                        weights=(10, 30, 60)
+                    else:
+                        weights=(20, 0, 80)
+                    mutate_dfa(new_dfa, weights=weights)
+
+                    mutant_score, mutant_movement_history = run_iteration(new_dfa, number_steps=number_steps)
+                    if mutant_score == 89:
+                        print("\nScore: 89")
+                        print("Number of moves:", len(mutant_movement_history))
+                        print("Move history:", mutant_movement_history)
+                        print("Number of states:", len(new_dfa.states))
+                        #visualise_iterations(new_dfa)
+                    mutant_scores_list.append(mutant_score)
+                    mutated_dfa_list.append(new_dfa)
+                    performance_dict[copy.deepcopy(new_dfa)] = [mutant_score, number_steps - len(mutant_movement_history)]
+
+        dfa_list = []
+        scores_list = []
+
+        for dfa_model in parent_dfas:
+            dfa_list.append(dfa_model)
+        for dfa_model in mutated_dfa_list:
+            dfa_list.append(dfa_model)
+        for score in parent_scores_list:
+            scores_list.append(score)
+        for score in mutant_scores_list:
+            scores_list.append(score)
+
+        average_score = sum(scores_list) / len(scores_list)
+
+        print("average score:", average_score)
+        print("best score of generation:", max(scores_list))
+        print("performance dict:", performance_dict)
+
+
 if __name__ == "__main__":
-    run_model(4, 600, 5000, 15)
+    run_model2(4, 600, 1000, 15)
     # TO DO
-    # Rank solutions by number of moves
     # Add parent combination
