@@ -265,20 +265,20 @@ def run_model2(initial_dfa_size, num_generations, generation_size, max_dfa_state
 
         # Visualise every 50 generations
         #if i % 30 == 0:
-        #    visualise_iterations(sorted_dfas[0])
+         #   visualise_iterations(sorted_dfas[0])
 
         parent_scores_list = []
         parent_dfas = sorted_dfas[0:50]
         for dfa_model in parent_dfas:
             parent_score, parent_movement_history = run_iteration(dfa_model, number_steps=number_steps)
             parent_scores_list.append(parent_score)
-            performance_dict[copy.deepcopy(dfa_model)] = [parent_score, number_steps - len(parent_movement_history)]
+            performance_dict[copy.deepcopy(dfa_model)] = [parent_score - len(parent_movement_history), number_steps - len(parent_movement_history)]
             if parent_score == 89:
                 print("\nScore: 89")
                 print("Number of moves:", len(parent_movement_history))
                 print("Move history:", parent_movement_history)
                 print("Number of states:", len(dfa_model.states))
-                #visualise_iterations(dfa_model)
+                visualise_iterations(dfa_model)
 
         mutated_dfa_list = []
         mutant_scores_list = []
@@ -287,12 +287,12 @@ def run_model2(initial_dfa_size, num_generations, generation_size, max_dfa_state
                 new_dfa = copy.deepcopy(dfa_model)
 
                 if random.randint(0, 100) < 100:
-
-                    if len(new_dfa.states) <= max_dfa_states:
-                        weights=(10, 30, 60)
-                    else:
-                        weights=(20, 0, 80)
-                    mutate_dfa(new_dfa, weights=weights)
+                    for q in range(4):
+                        if len(new_dfa.states) <= max_dfa_states:
+                            weights=(10, 30, 60)
+                        else:
+                            weights=(20, 0, 80)
+                        mutate_dfa(new_dfa, weights=weights)
 
                     mutant_score, mutant_movement_history = run_iteration(new_dfa, number_steps=number_steps)
                     if mutant_score == 89:
@@ -300,10 +300,11 @@ def run_model2(initial_dfa_size, num_generations, generation_size, max_dfa_state
                         print("Number of moves:", len(mutant_movement_history))
                         print("Move history:", mutant_movement_history)
                         print("Number of states:", len(new_dfa.states))
-                        #visualise_iterations(new_dfa)
+
+                        visualise_iterations(new_dfa)
                     mutant_scores_list.append(mutant_score)
                     mutated_dfa_list.append(new_dfa)
-                    performance_dict[copy.deepcopy(new_dfa)] = [mutant_score, number_steps - len(mutant_movement_history)]
+                    performance_dict[copy.deepcopy(new_dfa)] = [mutant_score - len(mutant_movement_history), number_steps - len(mutant_movement_history)]
 
         dfa_list = []
         scores_list = []
@@ -325,6 +326,6 @@ def run_model2(initial_dfa_size, num_generations, generation_size, max_dfa_state
 
 
 if __name__ == "__main__":
-    run_model2(4, 600, 1000, 15)
+    run_model2(4, 600, 1000, 5)
     # TO DO
     # Add parent combination

@@ -290,23 +290,19 @@ def run():
             run_iteration(dfa2, visualise=True)
 
 
-dfa_model = dfa_data()
-dfa_model.states = ['q0', 'q1', 'q2', 'q3', 'q4']
-dfa_model.transitions = {'q0': {0: ['q1', 'tr'], 1: ['q0', 'm']},
-                         'q1': {0: ['q2', 'tr'], 1: ['q0', 'm']},
-                         'q2': {0: ['q3', 'tr'], 1: ['q0', 'm']},
-                         'q3': {0: ['q4', 'tr'], 1: ['q0', 'm']},
-                         'q4': {0: ['q0', 'm'], 1: ['q0', 'm']}}
+#dfa_model = dfa_data()
+#dfa_model.states = ['q0', 'q1', 'q2', 'q3', 'q4']
+#dfa_model.transitions = {'q0': {0: ['q1', 'tr'], 1: ['q0', 'm']},
+#                         'q1': {0: ['q2', 'tr'], 1: ['q0', 'm']},
+#                         'q2': {0: ['q3', 'tr'], 1: ['q0', 'm']},
+#                         'q3': {0: ['q4', 'tr'], 1: ['q0', 'm']},
+#                         'q4': {0: ['q0', 'm'], 1: ['q0', 'm']}}
 
-score, agentActionHistory = run_iteration(dfa_model, visualise=True)
-print("Moves:", agentActionHistory)
-print("Number of moves: ", len(agentActionHistory))
+#score, agentActionHistory = run_iteration(dfa_model, visualise=True)
+#print("Moves:", agentActionHistory)
+#print("Number of moves: ", len(agentActionHistory))
 
-# sorting the list
-#scoresList.sort()
-#counter = 0
-# printing the last element
-#for individualScore in scoresList:
-    #if individualScore > 11:
-        #counter+=1
-#print("successful:", counter)
+performance_dict = {'a': [1, 20], 'b': [2, 27], 'c': [2, 25], 'd': [4, 15], 'e': [2, 12], 'f': [2, 28], 'g': [2, 27]}
+f_lst = {k: v for k, v in sorted(performance_dict.items(), key=lambda item: item[1])}
+print(f_lst.items())
+print(list(f_lst.keys()))
